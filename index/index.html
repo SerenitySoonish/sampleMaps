@@ -1,204 +1,84 @@
-<!DOCTYPE html>
-<html lang="en">
+<html>
+
 <head>
+  <meta charset='utf-8' />
+  <title>Add a marker using a place name</title>
+  <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+  <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.51.0/mapbox-gl.js'></script>
+  <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.51.0/mapbox-gl.css' rel='stylesheet' />
   <style>
-    /* Always set the map height explicitly to define the size of the div
-         * element that contains the map. */
-    #map {
-      height: 100%;
-    }
-  
-    /* Optional: Makes the sample page fill the window. */
-    html,
     body {
-      height: 100%;
       margin: 0;
       padding: 0;
     }
+
+    #map {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 100%;
+    }
   </style>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>Document</title>
-  <script src='https://npmcdn.com/@turf/turf/turf.min.js'></script>
 </head>
+
 <body>
-  <!-- <iframe width="600" height="450" frameborder="0" style="border:0" streetViewControl=true src="https://www.google.com/maps/embed/v1/place?q=place_id:ChIJDzGOGPilIIYRZwX_p94tdw4&key=AIzaSyA9qQsHrDMVE4dIC4MR5LnTjHS1FJAuYp8"
-    allowfullscreen></iframe>
-<iframe width="600" height="400" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="https://www.google.com/maps/embed/v1/streetview
-?key=AIzaSyA9qQsHrDMVE4dIC4MR5LnTjHS1FJAuYp8
-&location=29.97264,-90.08361699999999
-&heading=210
-&pitch=10
-&fov=35"></iframe> -->
 
-<!-- <iframe width="600" height="400" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="https://www.google.com/maps/embed/v1/search
-?key=AIzaSyA9qQsHrDMVE4dIC4MR5LnTjHS1FJAuYp8
-&q=restaurants+in+Seattle
-&q=restaurants+in+portland"></iframe> -->
-<!--  <iframe width="600" height="450" frameborder="0" style="border:0" src="https://www.google.com/maps/embed/v1/directions?origin=new+orleans+la&waypoints=hattiesburg+ms&destination=mobile+al&key=AIzaSyA9qQsHrDMVE4dIC4MR5LnTjHS1FJAuYp8"
-  allowfullscreen></iframe> -->
-  <div id="map"></div>
-<script>
-    var coords = [
-        [
-          -90.071478,
-          29.951052
-        ],
-        [
-          -91.31644,
-          30.451162
-        ],
-        [
-          -92.05018,
-          30.247265
-        ],
-        [
-          -94.00702,
-          30.135535
-        ],
-        [
-          -94.393901,
-          29.827512
-        ],
-        [
-          -97.671274,
-          29.651896
-        ],
-        [
-          -98.500624,
-          29.432434
-        ],
-        [
-          -98.896538,
-          29.976602
-        ],
-        [
-          -99.843023,
-          30.527213
-        ],
-        [
-          -100.233905,
-          30.445869
-        ],
-        [
-          -102.162948,
-          30.891977
-        ],
-        [
-          -105.709142,
-          31.178014
-        ],
-        [
-          -106.503865,
-          31.76095
-        ],
-        [
-          -106.801477,
-          32.294914
-        ],
-        [
-          -108.379028,
-          32.1791
-        ],
-        [
-          -108.746257,
-          32.354701
-        ],
-        [
-          -109.028903,
-          32.222576
-        ],
-        [
-          -109.6507,
-          32.362394
-        ],
-        [
-          -110.123789,
-          32.012246
-        ],
-        [
-          -110.455199,
-          31.964179
-        ],
-        [
-          -110.972962,
-          32.188764
-        ],
-        [
-          -111.680293,
-          32.815558
-        ],
-        [
-          -112.040051,
-          33.462032
-        ],
-        [
-          -112.623006,
-          33.427408
-        ],
-        [
-          -114.076784,
-          33.679161
-        ],
-        [
-          -115.888304,
-          33.665636
-        ],
-        [
-          -117.203307,
-          34.066559
-        ],
-        [
-          -118.243574,
-          34.052345
-        ]
-      ]
+  <div id='map'></div>
+  <script src='https://unpkg.com/es6-promise@4.2.4/dist/es6-promise.auto.min.js'></script>
+  <script src="https://unpkg.com/@mapbox/mapbox-sdk/umd/mapbox-sdk.min.js"></script>
+  <script>
+    mapboxgl.accessToken = 'pk.eyJ1IjoiZWxiYWRyeWQiLCJhIjoiY2pvZ2F5cDlwMGQ4eDNxbHB3MnpjZnE0biJ9.v2InrvAgCg8V_RvTHizHsg';
+    // eslint-disable-next-line no-undef
+    
 
-      var line = turf.lineString(coords);
-      console.log(line)
-        // var along = turf.along(line, 100);
-      let points = coords.map((coord, i)=>{
-        return turf.along(line, (i+1)*100);
-      });
-      let evenPoints = points.map(point=>{
-        return point.geometry.coordinates;
-      })
-      console.log(evenPoints);
+    var mapboxClient = mapboxSdk({ accessToken: mapboxgl.accessToken });
+    mapboxClient.geocoding.forwardGeocode({
+      query: 'New Orleans, Louisiana',
+      autocomplete: false,
+      limit: 1
+    })
+      .send()
+      .then(function (response) {
+        if (response && response.body && response.body.features && response.body.features.length) {
+          var feature = response.body.features[0];
 
-    function initMap() {
-        var set = evenPoints.map((pair)=>{
-          return {lat: parseFloat(pair[1]), lng: parseFloat(pair[0])}
-        })
-        var map = new google.maps.Map(document.getElementById('map'), {
-          zoom: 8,
-          center: {lat: evenPoints[10][1], lng: evenPoints[10][0]}
-        });
-
-        set.forEach((pair, i)=>{
-        var marker = new google.maps.Marker({
-          position: {lat: pair.lat, lng: pair.lng},
-          map: map,
-          title: 'Hello World!'
-        });
-      })
-      var path = evenPoints.map(coord=>{
-        return {lat: coord[1], lng: coord[0]}
-      })
-      var flightPath = new google.maps.Polyline({
-        path: path,
-        geodesic: true,
-        strokeColor: '#FF0000',
-        strokeOpacity: 1.0,
-        strokeWeight: 2
+          var map = new mapboxgl.Map({
+            container: 'map',
+            style: 'mapbox://styles/mapbox/streets-v9',
+            center: feature.center,
+            zoom: 10
+          });
+          let geo = [{ lat: 29.9565436, lng: -90.1044093 },
+          { lat: 29.9527463, lng: -90.07071909999999 },
+          { lat: 29.8944563, lng: -90.01822729999999 },
+          { lat: 29.93785, lng: -90.07592299999999 },
+          { lat: 29.95149, lng: -90.07025999999999 },
+          { lat: 29.8775019, lng: -90.04843249999999 },
+          { lat: 30.0063073, lng: -90.2519013 },
+          { lat: 29.9970293, lng: -90.161163 },
+          { lat: 29.990542, lng: -90.05786959999999 },
+          { lat: 29.8532921, lng: -90.10894599999999 },
+          { lat: 29.9488105, lng: -90.2324234 },
+          { lat: 29.9201635, lng: -90.03392319999999 },
+          { lat: 29.9076809, lng: -90.1600689 },
+          { lat: 29.945432, lng: -90.03711960000001 },
+          { lat: 29.9344245, lng: -90.0806708 },
+          { lat: 29.9979549, lng: -90.1800343 },
+          { lat: 29.9242826, lng: -90.01818469999999 },
+          { lat: 29.962082, lng: -90.02080590000001 },
+          { lat: 29.8910133, lng: -90.05855489999999 },
+          { lat: 30.0099729, lng: -90.26704439999999 }];
+          geo.forEach(coord=>{
+            new mapboxgl.Marker()
+              .setLngLat(coord)
+              .addTo(map); 
+          })
+          
+        }
       });
 
-      flightPath.setMap(map);
-      }
   </script>
-  <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA9qQsHrDMVE4dIC4MR5LnTjHS1FJAuYp8&callback=initMap">
-  </script> 
- 
- <!-- <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA9qQsHrDMVE4dIC4MR5LnTjHS1FJAuYp8&callback=initMap" type="text/javascript"></script> -->
+
 </body>
+
 </html>

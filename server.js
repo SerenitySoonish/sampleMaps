@@ -20,7 +20,6 @@ app.get('/coords', (req, res)=>{
     }
   })
 });
-
 var coords = [
   [
     -90.071478,
@@ -71,6 +70,32 @@ app.get('/parks', (req, res)=>{
     })
     })
 // 'http://router.project-osrm.org/route/v1/driving/90.071533000,29.951065000;91.147385,30.471165?geometries=geojson'
+
+
+app.get('/chick', (req, res)=>{
+  request.get(`https://maps.googleapis.com/maps/api/place/nearbysearch/json?
+  radius=50000&key=${process.env.GOOGLE_API}
+  &keyword=brothers+chicken
+  &location=29.951065,-90.071533`, (err, response, body) => {
+    if (!err) {
+      body = JSON.parse(body);
+      res.send(body);
+    } else {
+      res.send(err);
+    }
+})
+});
+
+app.get('/test', (req, res) => {
+  axios.get(`https://maps.googleapis.com/maps/api/place/nearbysearch/json?radius=50000&key=${process.env.GOOGLE_API}&keyword=brothers+chicken&location=29.951065,-90.071533`)
+  .then(response=>{
+    console.log(response.data.results);
+    res.send(response.data.results)
+  })
+  .catch(err=>{
+    res.send(err)
+  })
+})
 
 let port = 3000;
 app.listen(process.env.PORT || port, function () {
